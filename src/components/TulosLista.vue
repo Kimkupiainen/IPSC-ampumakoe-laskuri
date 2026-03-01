@@ -205,9 +205,9 @@ async function createPdf(ampuja: string) {
   const hyvaksytty        = !dq && kaikkiSuoritettu && hyvaksyttyjenLkm >= IpscAmpumakoe.hyvaksymisAsemia
 
   if (hyvaksytty) {
-    txt('X', 65, 205, 14, boldFont, GREEN)
+    txt('X', 65, 245, 18, boldFont, GREEN)
   } else if (kaikkiSuoritettu || dq) {
-    txt('X', 65, 165, 14, boldFont, RED)
+    txt('X', 65, 165, 18, boldFont, RED)
     if (dq) txt(pisteetStore.hylkaykset[ampuja], 100, 160, 8, font, RED)
   }
 
