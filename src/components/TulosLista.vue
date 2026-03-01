@@ -205,14 +205,14 @@ async function createPdf(ampuja: string) {
   const hyvaksytty        = !dq && kaikkiSuoritettu && hyvaksyttyjenLkm >= IpscAmpumakoe.hyvaksymisAsemia
 
   if (hyvaksytty) {
-    txt('X', 60, 205, 18, boldFont, GREEN)
+    txt('X', 60, 225, 18, boldFont, GREEN)
   } else if (kaikkiSuoritettu || dq) {
     txt('X', 60, 165, 18, boldFont, RED)
     if (dq) txt(pisteetStore.hylkaykset[ampuja], 100, 160, 8, font, RED)
   }
 
   // Päivämäärä
-  txt(new Date().toLocaleDateString('fi-FI'), 170, 68, 16)
+  txt(new Date().toLocaleDateString('fi-FI'), 174, 80, 14)
 
   const pdfBytes = await pdfDoc.save()
   download(pdfBytes, 'ipsc-ampumakoe-' + new Date().toISOString().substring(0, 10) + '-' + ampuja.replace(' ', '-') + '.pdf', 'application/pdf')
