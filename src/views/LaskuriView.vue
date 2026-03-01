@@ -50,7 +50,7 @@ const seuraavaLinkki = (rasti: number, ampuja: string) => {
   const seuraavaAmpuja = rastinSeuraavaAmpuja(rasti, ampuja)
   // Seuraava rasti
   if (seuraavaAmpuja == null) {
-    if (rasti == 4) {
+    if (rasti == 8) {
       return '/'
     } else {
       return '/kirjaus/' + (rasti + 1) + '/' + kierrataJarjestys(Object.keys(pisteetStore.pisteet), rasti + 1)[0]
@@ -91,8 +91,8 @@ const rastinEdellinenAmpuja = (rasti: number, ampuja: string): string | null => 
 const ohjeFraasi = (rasti: number, ampuja: string) : string => {
   const seuraavaAmpuja = rastinSeuraavaAmpuja(rasti, ampuja)
   if (seuraavaAmpuja == null) {
-    if (rasti < 4) {
-      return `Ammutaan. Seuraava ampuja ${ampuja}, tämän rastin viimeinen ampuja.`
+    if (rasti < 8) {
+      return `Ammutaan. Seuraava ampuja ${ampuja}, tämän aseman viimeinen ampuja.`
     } else {
       return `Ammutaan. Seuraava ampuja ${ampuja}, IPSC-ampumakokeen viimeinen suoritus.`
     }
@@ -262,12 +262,8 @@ const tulkitseSyotettyAika = (event: Event) => {
  */
 const confirmKeskenerainenKirjaus = (ampuja: string, rasti: number) => {
   if (
-      // Ensimmäinen aika puuttuu (mikä tahansa rasti)
+      // Aika puuttuu
       !(pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[0] > 0)
-      // Toinen aika puuttuu (rasti 1 ja 2)
-      || ([0, 1].includes(rasti) && !(pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[1] > 0))
-      // Kolmas aika puuttuu
-      || ([0, 1].includes(rasti) && !(pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[2] > 0))
       // Ensimmäisen taulun pisteytys on kesken
       || !taulunPisteytysValmis(ampuja, rasti, 0)
       // Toisen taulun pisteytys on kesken
@@ -288,8 +284,8 @@ const confirmKeskenerainenKirjaus = (ampuja: string, rasti: number) => {
 
     <nav class="rastit">
       <ul>
-        <li :key="r" class="rasti" v-for="r in [0,1,2,3,4]" v-bind:class="rastiClasses(rasti, r)">
-          <a class="rasti" :href="'../../kirjaus/' + r + '/' + ampuja">Rasti {{ r + 1 }}</a>
+        <li :key="r" class="rasti" v-for="r in [0,1,2,3,4,5,6,7,8]" v-bind:class="rastiClasses(rasti, r)">
+          <a class="rasti" :href="'../../kirjaus/' + r + '/' + ampuja">{{ r + 1 }}</a>
         </li>
       </ul>
     </nav>
@@ -312,14 +308,14 @@ const confirmKeskenerainenKirjaus = (ampuja: string, rasti: number) => {
       </div>
 
       <div class="rastiotsikkopalkki">
-        <h2 class="rastiotsikko">Rasti {{ rasti+1 }} / {{ ampuja }} </h2><div class="tulos" v-bind:class="rastinOsumakerroin(ampuja, rasti) >= 1.3 ? 'ok' : 'notok'">{{ muotoileOsumakerroin(rastinOsumakerroin(ampuja, rasti)) }}</div>
+        <h2 class="rastiotsikko">Asema {{ rasti+1 }} / {{ ampuja }} </h2><div class="tulos" v-bind:class="rastinOsumakerroin(ampuja, rasti) >= 1.4 ? 'ok' : 'notok'">{{ muotoileOsumakerroin(rastinOsumakerroin(ampuja, rasti)) }}</div>
       </div>
 
       <div class="actions">
         <button v-if="!(ampuja in pisteetStore.hylkaykset)" class="action dq" @click="kirjaaHylkays(ampuja)">Kirjaa DQ</button>
         <button v-else @click="peruHylkays(ampuja as string)">Peru DQ</button>
 
-        <button class="action" @click="naytaRastiInfo = true">ⓘ Rastikuvaus</button>
+        <button class="action" @click="naytaRastiInfo = true">ⓘ Asemakuvaus</button>
 
         <button v-if="pisteetStore.mute === true" class="action" @click="pisteetStore.mute = false">🔊 Poista mykistys</button>
         <button v-if="pisteetStore.mute === false" class="action" @click="pisteetStore.mute = true">🔇 Mykistä</button>
@@ -327,7 +323,7 @@ const confirmKeskenerainenKirjaus = (ampuja: string, rasti: number) => {
 
       <div class="rasti-info-tausta" v-if="naytaRastiInfo"></div>
       <div class="rasti-info" v-if="naytaRastiInfo">
-        <h2>Rasti {{rasti + 1}}</h2>
+        <h2>Asema {{rasti + 1}}</h2>
 
         <p>{{naytaKuvaus(rasti)}}</p>
 
@@ -342,20 +338,6 @@ const confirmKeskenerainenKirjaus = (ampuja: string, rasti: number) => {
           <th class="aika" v-bind:class="pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[0] > 0 ? 'ok' : 'notok'">{{ pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[0] > 0 ? '✔' : '⏱' }}</th>
           <td>
             <input id="aika1" onfocus="this.select()" class="sekunnit" v-model="pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[0]" type="number" min="0.00" step="0.01" :disabled="ampuja in pisteetStore.hylkaykset"/>
-          </td>
-        </tr>
-        <tr v-if="rasti in [0, 1]">
-          <th class="aika" v-bind:class="pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[1] > 0 ? 'ok' : 'notok'">{{ pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[1] > 0 ? '✔' : '⏱' }}</th>
-          <td>
-            <input id="aika2" onfocus="this.select()" class="sekunnit" v-model="pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[1]" type="number"
-                    min="0.00" step="0.01" :disabled="ampuja in pisteetStore.hylkaykset"/>
-          </td>
-        </tr>
-        <tr v-if="rasti in [0, 1]">
-          <th class="aika" v-bind:class="pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[2] > 0 ? 'ok' : 'notok'">{{ pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[2] > 0 ? '✔' : '⏱' }}</th>
-          <td>
-            <input id="aika3" onfocus="this.select()" class="sekunnit" v-model="pisteetStore.getPelaajanRastiAjat(ampuja, rasti)[2]" type="number"
-                    min="0.00" step="0.01" :disabled="ampuja in pisteetStore.hylkaykset"/>
           </td>
         </tr>
 
@@ -606,8 +588,8 @@ nav.rastit {
   ul li {
     display: inline-block;
     a {
-      width: 3.9rem;
-      padding: .2rem .4rem 0 .9rem;
+      width: 1.8rem;
+      padding: .2rem .2rem 0 .5rem;
     }
   }
   ul li.done a {
@@ -696,7 +678,7 @@ nav.rastit {
     z-index: 5;
   }
   ul li:first-child a {
-    width: 3.4rem;
+    width: 1.5rem;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
   }
