@@ -128,10 +128,13 @@ const muotoileAika = (luku: number) : string => {
 
 
 async function createPdf(ampuja: string) {
+  try {
   const { StandardFonts } = await import('pdf-lib')
 
   // Ladataan PDF-pohja
-  const templateBytes = await fetch(import.meta.env.BASE_URL + 'IPSC-ampumakoe.pdf').then(r => r.arrayBuffer())
+  const resp = await fetch(import.meta.env.BASE_URL + 'IPSC-ampumakoe.pdf')
+  if (!resp.ok) throw new Error(`PDF-pohjan lataus epäonnistui: HTTP ${resp.status} — URL: ${import.meta.env.BASE_URL}IPSC-ampumakoe.pdf`)
+  const templateBytes = await resp.arrayBuffer()
   const pdfDoc = await PDFDocument.load(templateBytes)
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
@@ -213,6 +216,10 @@ async function createPdf(ampuja: string) {
 
   const pdfBytes = await pdfDoc.save()
   download(pdfBytes, 'ipsc-ampumakoe-' + new Date().toISOString().substring(0, 10) + '-' + ampuja.replace(' ', '-') + '.pdf', 'application/pdf')
+  } catch (err) {
+    alert('PDF-luonti epäonnistui:\n' + (err instanceof Error ? err.message : String(err)))
+    console.error('createPdf error:', err)
+  }
 }
 
 // onMounted(() => {
