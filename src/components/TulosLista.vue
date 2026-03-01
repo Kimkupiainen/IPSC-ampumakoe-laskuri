@@ -205,9 +205,9 @@ async function createPdf(ampuja: string) {
   const hyvaksytty        = !dq && kaikkiSuoritettu && hyvaksyttyjenLkm >= IpscAmpumakoe.hyvaksymisAsemia
 
   if (hyvaksytty) {
-    txt('X', 289, 305, 11, boldFont, GREEN)
+    txt('X', 65, 205, 14, boldFont, GREEN)
   } else if (kaikkiSuoritettu || dq) {
-    txt('X', 65, 165, 11, boldFont, RED)
+    txt('X', 65, 165, 14, boldFont, RED)
     if (dq) txt(pisteetStore.hylkaykset[ampuja], 100, 160, 8, font, RED)
   }
 
@@ -239,7 +239,7 @@ async function createPdf(ampuja: string) {
     <div class="intro" v-if="muokkausTila">
       Tervetuloa IPSC-ampumakokeeseen. Syötä ampumakokeeseen osallistuvien henkilöiden nimet alla. Sovellukseen
       kirjatut tiedot tallentuvat ainoastaan päätelaitteen muistiin. Tietoja ei tallenneta eikä jaeta verkossa. Voit
-      ladata PDF-muotoiset tuloskortat tuloksien kirjaamisen jälkeen.
+      ladata PDF-muotoiset tuloskortit tuloksien kirjaamisen jälkeen.
     </div>
 
     <h2 v-if="muokkausTila">Ampujat</h2>
