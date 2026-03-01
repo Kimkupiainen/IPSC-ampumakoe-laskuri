@@ -207,8 +207,8 @@ async function createPdf(ampuja: string) {
   if (hyvaksytty) {
     txt('X', 289, 305, 11, boldFont, GREEN)
   } else if (kaikkiSuoritettu || dq) {
-    txt('X', 289, 283, 11, boldFont, RED)
-    if (dq) txt(pisteetStore.hylkaykset[ampuja], 340, 283, 8, font, RED)
+    txt('X', 240, 183, 11, boldFont, RED)
+    if (dq) txt(pisteetStore.hylkaykset[ampuja], 240, 183, 8, font, RED)
   }
 
   // Päivämäärä
