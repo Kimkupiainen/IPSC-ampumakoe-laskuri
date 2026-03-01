@@ -366,7 +366,7 @@ table#tuloslista {
       word-wrap: anywhere;
       font-size: 105%;
       background-color: #ececec;
-      border-bottom: 2px solid #145014;
+      border-bottom: 2px solid #3a7a96;
       color: var(--vari1);
       font-weight: bold;
 
