@@ -35,7 +35,7 @@ const version = __APP_VERSION__
 
     <h3>1.0.0 (1.3.2026)</h3>
     <ul>
-      <li>IPSC-ampumakoe-laskuri – mukaeltu SRA-laskurista IPSC-käyttöön</li>
+      <li>IPSC-ampumakoe-laskuri – IPSC-ampumakokeen pistelaskuri</li>
       <li>IPSC Minor -pisteytys (A=5, C=3, D=1, Ohi=−10, Rang=−10)</li>
       <li>5 kiinteää IPSC-rastisuoritusta</li>
       <li>PDF-tuloskortti ilman ulkoisia riippuvuuksia</li>

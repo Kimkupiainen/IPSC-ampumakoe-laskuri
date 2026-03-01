@@ -7,8 +7,6 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
   <header style="background: #ddd">
 
-    <!--    <img alt="SRA maalitaulu" src="./assets/logo.svg" width="80px"/>-->
-    <!--    <img alt="metsä" src="./assets/metsa.jpg" />-->
 
     <div class="wrapper">
 
