@@ -174,7 +174,7 @@ async function createPdf(ampuja: string) {
     const rastiPisteet = pisteetStore.getPelaajaRastiPisteSumma(ampuja, rasti)
     const rastiHF      = rastiAika > 0 ? rastiPisteet / rastiAika : 0
     const suoritettu   = pisteetStore.getRastiSuorituksenTila(ampuja, rasti)
-    const ok           = suoritettu === 2 && rastiHF >= IpscAmpumakoe.hyvaksymisRaja
+    const ok           = suoritettu === 2 && Math.round(rastiHF * 100) / 100 >= IpscAmpumakoe.hyvaksymisRaja
 
     // T1-rivi: A, C, D, M (Ohi), Pr (Rang)
     txt(muotoileLuku(p[0][0]), X.A,  t1Y, 8, font, BLACK)

@@ -95,7 +95,7 @@ export const usePisteetStore = defineStore('pisteet', {
         .filter(rasti => {
           const pts = this.getPelaajaRastiPisteSumma(ampuja, rasti)
           const t = this.getPelaajanRastiAika(ampuja, rasti)
-          return t > 0 && (pts / t) >= IpscAmpumakoe.hyvaksymisRaja
+          return t > 0 && Math.round((pts / t) * 100) / 100 >= IpscAmpumakoe.hyvaksymisRaja
         }).length
     },
     getRastiSuorituksenTila(ampuja: string, rasti: number) {
