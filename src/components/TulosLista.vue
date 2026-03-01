@@ -161,7 +161,7 @@ async function createPdf(ampuja: string) {
   // ── Pistetaulukko (9 asemaa, T1 ja T2) ───────────────────────────────────
   // Sarakkeiden x-koordinaatit (vasemmasta reunasta mitattuna)
   // HUOM: Nämä ovat arvioja — säädä tarvittaessa testauksen perusteella
-  const X = { A: 344, C: 348, D: 366, M: 384, Pr: 402, Pist: 420, Aika: 453, HF: 503 }
+  const X = { A: 344, C: 348, D: 366, M: 384, Pr: 402, Pist: 450, Aika: 453, HF: 523 }
 
   for (let rasti = 0; rasti < 9; rasti++) {
     // Kukin asema vie 42pt: otsikkorivi (sisältää "A C D M Pr Pist Aika HF") + T1-rivi + T2-rivi (à ~14pt)
