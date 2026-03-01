@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePisteetStore } from '@/stores/pisteet'
-import { SraAmpumakoe } from "@/classes/SraAmpumakoe"
+import { IpscAmpumakoe } from "@/classes/IpscAmpumakoe"
 import OsumaLaskuri from "@/components/OsumaLaskuri.vue"
 
 
@@ -49,8 +49,8 @@ const pisteSumma = (pist: Array<Array<number>>, luokkaIdx: number) : number => {
     <td>
       <OsumaLaskuri :ampuja="ampuja" :rasti="rasti" :osumaluokka="props.osumaluokka" :taulu="1" />
     </td>
-    <td>{{ osumaSumma(pisteetStore.pisteet[props.ampuja][props.rasti], SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) }}</td>
-    <td>{{ pisteSumma(pisteetStore.pisteet[props.ampuja][props.rasti], SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) }}</td>
+    <td>{{ osumaSumma(pisteetStore.pisteet[props.ampuja][props.rasti], IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) }}</td>
+    <td>{{ pisteSumma(pisteetStore.pisteet[props.ampuja][props.rasti], IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) }}</td>
 <!--    <td>-->
 <!--      <div class="nowrap">-->
 <!--      <div class="vaihe" v-if="props.rasti < 2 && SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka) < 3">-->

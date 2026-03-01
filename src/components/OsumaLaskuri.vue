@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePisteetStore } from '@/stores/pisteet'
-import {SraAmpumakoe} from "@/classes/SraAmpumakoe";
+import {IpscAmpumakoe} from "@/classes/IpscAmpumakoe";
 import {computed} from "vue";
 
 const pisteetStore = usePisteetStore()
@@ -20,20 +20,20 @@ const minOsumat = 0
 /** Tämän osumaluokan (A/C/D/Ohi/Rang) lukumäärät tässä taulussa. */
 const osumaLkm = computed({
   get() {
-    return pisteetStore.pisteet[props.ampuja][props.rasti][SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)][props.taulu]
+    return pisteetStore.pisteet[props.ampuja][props.rasti][IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)][props.taulu]
   },
   set(newValue: number) {
-    pisteetStore.pisteet[props.ampuja][props.rasti][SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)][props.taulu] = newValue
+    pisteetStore.pisteet[props.ampuja][props.rasti][IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)][props.taulu] = newValue
   }
 })
 
 /** Rangaistuksien lukumäärä tämän taulun osalta. */
 const rangLkm = computed({
   get() {
-    return pisteetStore.pisteet[props.ampuja][props.rasti][SraAmpumakoe.osumaluokat.indexOf('Rang')][props.taulu]
+    return pisteetStore.pisteet[props.ampuja][props.rasti][IpscAmpumakoe.osumaluokat.indexOf('Rang')][props.taulu]
   },
   set(newValue: number) {
-    pisteetStore.pisteet[props.ampuja][props.rasti][SraAmpumakoe.osumaluokat.indexOf('Rang')][props.taulu] = newValue
+    pisteetStore.pisteet[props.ampuja][props.rasti][IpscAmpumakoe.osumaluokat.indexOf('Rang')][props.taulu] = newValue
   }
 })
 
@@ -42,13 +42,8 @@ const maxOsumat = computed(() => {
   if (props.osumaluokka == 'Rang') {
     return 100
   }
-  if (pisteetStore.rastin5suoritustavat[props.ampuja] == 'kiv') {
-    return SraAmpumakoe.laukausMaaratKivaarilla[props.rasti][props.taulu] - (pisteetStore.pisteet[props.ampuja][props.rasti]
-        .reduce((acc, cur) => acc + Number(cur[props.taulu]), 0) - osumaLkm.value - rangLkm.value)
-  } else {
-    return SraAmpumakoe.laukausMaaratPistoolilla[props.rasti][props.taulu] - (pisteetStore.pisteet[props.ampuja][props.rasti]
-        .reduce((acc, cur) => acc + Number(cur[props.taulu]), 0) - osumaLkm.value - rangLkm.value)
-  }
+  return IpscAmpumakoe.laukausMaaratPistoolilla[props.rasti][props.taulu] - (pisteetStore.pisteet[props.ampuja][props.rasti]
+      .reduce((acc, cur) => acc + Number(cur[props.taulu]), 0) - osumaLkm.value - rangLkm.value)
 })
 
 const sano = (s: any) => {
@@ -70,7 +65,7 @@ const miinus = () => {
 const plus = () => {
   if (osumaLkm.value < maxOsumat.value || props.osumaluokka == 'Rang') {
     osumaLkm.value++
-    sano(SraAmpumakoe.osumaLuokatLausuttuna(props.osumaluokka))
+    sano(IpscAmpumakoe.osumaLuokatLausuttuna(props.osumaluokka))
   }
 }
 

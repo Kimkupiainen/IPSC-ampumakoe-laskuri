@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import {RastiSuorituksenTila, SraAmpumakoe} from "@/classes/SraAmpumakoe";
+import {RastiSuorituksenTila, IpscAmpumakoe} from "@/classes/IpscAmpumakoe";
 
 type AmpujaPisteet = {
   [nimi: string]: Array<Array<Array<number>>>
@@ -8,9 +8,6 @@ type AmpujaAjat = {
   [nimi: string]: Array<Array<number>>
 }
 type Hylkaykset = {
-  [nimi: string]: string
-}
-type Rastin5Suoritustavat = {
   [nimi: string]: string
 }
 
@@ -26,7 +23,6 @@ export const usePisteetStore = defineStore('pisteet', {
     pisteet: {} as AmpujaPisteet,
     ajat: {} as AmpujaAjat,
     hylkaykset: {} as Hylkaykset,
-    rastin5suoritustavat: {} as Rastin5Suoritustavat,
     jarjestys: ''
   }),
   persist: true,
@@ -34,7 +30,6 @@ export const usePisteetStore = defineStore('pisteet', {
     lisaaPelaaja(nimi: any) {
       this.pisteet[nimi] = new Array(5).fill(0).map(() => new Array(6).fill(0).map(() => new Array(2).fill(0)))
       this.ajat[nimi] = new Array(5).fill(0).map(() => new Array(3).fill(0))
-      this.rastin5suoritustavat[nimi] = 'pist'
       // Jos lisätään uusi ampuja, tarvitaan uusi vahvistus, että turvallisuuskoulutus on annettu kaikille
       this.turvallisuuskoulutusSuoritettu = false
     },
@@ -96,7 +91,7 @@ export const usePisteetStore = defineStore('pisteet', {
       // Onko kaikki laukaukset pisteytetty?
       const pisteytetytOsumat = this.getPelaajaRastiLuokkaOsumat(ampuja, rasti).reduce((a,b) => a + b, 0)
 
-      const rastinLaukausmaara = this.rastin5suoritustavat[ampuja] === 'pist' ? SraAmpumakoe.laukausMaaratPistoolilla[rasti].reduce((a,b)=> a + b, 0) : SraAmpumakoe.laukausMaaratKivaarilla[rasti].reduce((a,b)=> a + b, 0)
+      const rastinLaukausmaara = IpscAmpumakoe.laukausMaaratPistoolilla[rasti].reduce((a,b)=> a + b, 0)
 
       let ajatKirjattu = false
       // Onko kaikki ajat merkitty (rasteilla 1-2 kolme eri aikaa)?
@@ -121,7 +116,6 @@ export const usePisteetStore = defineStore('pisteet', {
       delete this.pisteet[ampuja]
       delete this.ajat[ampuja]
       delete this.hylkaykset[ampuja]
-      delete this.rastin5suoritustavat[ampuja]
 
       // Merkintä turvallisuuskouluksesta vanhenee jos kaikki osallistujat poistetaan.
       if (Object.keys(this.ajat).length == 0) {
@@ -146,7 +140,6 @@ export const usePisteetStore = defineStore('pisteet', {
       this.pisteet = {}
       this.ajat =  {}
       this.hylkaykset = {}
-      this.rastin5suoritustavat = {}
       this.turvallisuuskoulutusSuoritettu = false
       this.jarjestys = "kiertava"
     },
