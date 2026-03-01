@@ -1,15 +1,15 @@
 @import './base.css';
 
 :root {
-  --color-text: #191a0f;
+  --color-text: #1a2535;
 }
 
 
 html {
-  --vari1: #546552;
-  --vari2: #e7d7a6;
-  --vari3: #f5d28d;
-  --vari4: #e0cdb1;
+  --vari1: #5597b3;
+  --vari2: #e8f4f8;
+  --vari3: #bdd9e8;
+  --vari4: #d0e8f2;
 }
 
 #app {
@@ -49,7 +49,7 @@ button.dq::before {
 }
 
 .next {
-  background-color: #145014;
+  background-color: #3a7a96;
 }
 
 
