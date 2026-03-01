@@ -161,13 +161,13 @@ async function createPdf(ampuja: string) {
   // ── Pistetaulukko (9 asemaa, T1 ja T2) ───────────────────────────────────
   // Sarakkeiden x-koordinaatit (vasemmasta reunasta mitattuna)
   // HUOM: Nämä ovat arvioja — säädä tarvittaessa testauksen perusteella
-  const X = { A: 313, C: 333, D: 353, M: 373, Pr: 393, Pist: 415, Aika: 453, HF: 503 }
+  const X = { A: 330, C: 348, D: 366, M: 384, Pr: 402, Pist: 420, Aika: 453, HF: 503 }
 
   for (let rasti = 0; rasti < 9; rasti++) {
-    // Kunkin aseman T1- ja T2-rivin y-koordinaatit
-    // Jokainen asema vie ~42 pistettä pystysuunnassa (otsikko + T1 + T2)
-    const t1Y = 684 - rasti * 42
-    const t2Y = 670 - rasti * 42
+    // Kukin asema vie 42pt: otsikkorivi (sisältää "A C D M Pr Pist Aika HF") + T1-rivi + T2-rivi (à ~14pt)
+    // t1Y = T1-datarivi, t2Y = T2-datarivi (otsikkorivi on 14pt korkeammalla)
+    const t1Y = 670 - rasti * 42
+    const t2Y = 656 - rasti * 42
 
     const p = pisteetStore.pisteet[ampuja][rasti]
     const rastiAika    = pisteetStore.getPelaajanRastiAika(ampuja, rasti)
