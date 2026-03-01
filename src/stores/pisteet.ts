@@ -28,8 +28,10 @@ export const usePisteetStore = defineStore('pisteet', {
   persist: true,
   actions: {
     lisaaPelaaja(nimi: any) {
-      this.pisteet[nimi] = new Array(5).fill(0).map(() => new Array(6).fill(0).map(() => new Array(2).fill(0)))
-      this.ajat[nimi] = new Array(5).fill(0).map(() => new Array(3).fill(0))
+      // 9 asemaa × 6 osumaluokkaa × 2 taulua
+      this.pisteet[nimi] = new Array(9).fill(0).map(() => new Array(6).fill(0).map(() => new Array(2).fill(0)))
+      // 9 asemaa × 1 aika per asema (Comstock, ei sarja-aikoja)
+      this.ajat[nimi] = new Array(9).fill(0).map(() => new Array(1).fill(0))
       // Jos lisätään uusi ampuja, tarvitaan uusi vahvistus, että turvallisuuskoulutus on annettu kaikille
       this.turvallisuuskoulutusSuoritettu = false
     },
@@ -73,18 +75,28 @@ export const usePisteetStore = defineStore('pisteet', {
     },
     // Ampujan yhteispisteet (osittain suoritettuja rasteja ei lasketa)
     getPelaajanPisteSumma(ampuja: string) : number {
-      return [0,1,2,3,4].map((rasti) =>
+      return [0,1,2,3,4,5,6,7,8].map((rasti) =>
           this.getRastiSuorituksenTila(ampuja, rasti) == RastiSuorituksenTila.Suoritettu ? this.getPelaajaRastiPisteSumma(ampuja, rasti) : 0).reduce((a,b) => a + b)
     },
 
     // Ampujan kokonaisaika (osittain suoritettuja rasteja ei lasketa)
     getPelaajanAikaSumma(ampuja: string) : number {
-      return [0, 1, 2, 3, 4].map(rasti =>
+      return [0, 1, 2, 3, 4, 5, 6, 7, 8].map(rasti =>
           this.getRastiSuorituksenTila(ampuja, rasti) == RastiSuorituksenTila.Suoritettu ? this.ajat[ampuja][rasti].reduce((a,b)=> a + b, 0) : 0)
           .reduce((a,b)=>a+b,0)
     },
     getPelaajanOsumakerroin(ampuja: string) : number {
       return this.getPelaajanPisteSumma(ampuja) / this.getPelaajanAikaSumma(ampuja)
+    },
+    // Montako asemaa on hyväksytty (HF ≥ 1,4)
+    getPelaajanHyvaksyttyjenAsemienLkm(ampuja: string) : number {
+      return [0,1,2,3,4,5,6,7,8]
+        .filter(rasti => this.getRastiSuorituksenTila(ampuja, rasti) === RastiSuorituksenTila.Suoritettu)
+        .filter(rasti => {
+          const pts = this.getPelaajaRastiPisteSumma(ampuja, rasti)
+          const t = this.getPelaajanRastiAika(ampuja, rasti)
+          return t > 0 && (pts / t) >= IpscAmpumakoe.hyvaksymisRaja
+        }).length
     },
     getRastiSuorituksenTila(ampuja: string, rasti: number) {
 
@@ -93,19 +105,14 @@ export const usePisteetStore = defineStore('pisteet', {
 
       const rastinLaukausmaara = IpscAmpumakoe.laukausMaaratPistoolilla[rasti].reduce((a,b)=> a + b, 0)
 
-      let ajatKirjattu = false
-      // Onko kaikki ajat merkitty (rasteilla 1-2 kolme eri aikaa)?
-      if (rasti == 0 || rasti == 1) {
-        ajatKirjattu = [0, 1, 2].map((x) => this.ajat[ampuja][rasti][x]).indexOf(0) == -1
-      } else {
-        ajatKirjattu = (this.ajat[ampuja][rasti][0] > 0)
-      }
+      // Onko aika kirjattu (yksi aika per asema, Comstock)
+      const ajatKirjattu = (this.ajat[ampuja][rasti][0] > 0)
 
       // Kesken: vain osa osumista on kirjattu tai aikakirjaus puuttuu
       if ((pisteytetytOsumat > 0 && pisteytetytOsumat < rastinLaukausmaara) || (pisteytetytOsumat > 0 && !ajatKirjattu) || (pisteytetytOsumat == 0 && ajatKirjattu)) {
         return RastiSuorituksenTila.Kesken
       }
-      // Kaikki laukaukset on pisteytetty ja ajat on kirjattu
+      // Kaikki laukaukset on pisteytetty ja aika on kirjattu
       if (pisteytetytOsumat >= rastinLaukausmaara && ajatKirjattu) {
         return RastiSuorituksenTila.Suoritettu
       }
@@ -125,7 +132,7 @@ export const usePisteetStore = defineStore('pisteet', {
 
     },
     getKaikkiRastitSuoritettu(ampuja: string) {
-      return [0,1,2,3,4].map((x) => this.getRastiSuorituksenTila(ampuja, x)).filter((x) => x === RastiSuorituksenTila.Suoritettu).length === 5
+      return [0,1,2,3,4,5,6,7,8].map((x) => this.getRastiSuorituksenTila(ampuja, x)).filter((x) => x === RastiSuorituksenTila.Suoritettu).length === 9
     },
     getHylkaysperuste(ampuja: string) {
       return this.hylkaykset[ampuja]
