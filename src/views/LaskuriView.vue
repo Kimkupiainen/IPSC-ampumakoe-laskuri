@@ -308,7 +308,7 @@ const confirmKeskenerainenKirjaus = (ampuja: string, rasti: number) => {
       </div>
 
       <div class="rastiotsikkopalkki">
-        <h2 class="rastiotsikko">Asema {{ rasti+1 }} / {{ ampuja }} </h2><div class="tulos" v-bind:class="rastinOsumakerroin(ampuja, rasti) >= 1.4 ? 'ok' : 'notok'">{{ muotoileOsumakerroin(rastinOsumakerroin(ampuja, rasti)) }}</div>
+        <h2 class="rastiotsikko">Asema {{ rasti+1 }} / {{ ampuja }} </h2><div class="tulos" v-bind:class="Math.round(rastinOsumakerroin(ampuja, rasti) * 100) / 100 >= 1.4 ? 'ok' : 'notok'">{{ muotoileOsumakerroin(rastinOsumakerroin(ampuja, rasti)) }}</div>
       </div>
 
       <div class="actions">
