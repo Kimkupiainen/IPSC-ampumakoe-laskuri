@@ -6,7 +6,7 @@
 
 import { usePisteetStore } from '@/stores/pisteet'
 import { ref } from "vue";
-import { RastiSuorituksenTila, SraAmpumakoe } from "@/classes/SraAmpumakoe";
+import { RastiSuorituksenTila, IpscAmpumakoe } from "@/classes/IpscAmpumakoe";
 import { PDFDocument, rgb } from 'pdf-lib'
 import download from "downloadjs"
 
@@ -132,57 +132,102 @@ const muotoileAika = (luku: number) : string => {
 
 
 async function createPdf(ampuja: string) {
+  const { StandardFonts } = await import('pdf-lib')
 
-  const RASTI_Y_OFFSET = [687, 573, 469, 366, 262]
+  const pdfDoc = await PDFDocument.create()
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+  const page = pdfDoc.addPage([595, 842]) // A4
 
-  const ROW_H = 12
+  const BLACK = rgb(0, 0, 0)
+  const GREEN = rgb(0, 0.5, 0)
+  const RED = rgb(0.7, 0, 0)
+  const GRAY = rgb(0.5, 0.5, 0.5)
 
-  const T1_X = 393
-  const T2_X = 427
-  const OSUMAT_X = 465
-  const PISTEET_X = 505
-  const AIKA_X = 538
+  let y = 800
 
-  const fontBytes = await fetch('sra-ampumakoe.pdf').then((res) => res.arrayBuffer());
-  const pdfDoc = await PDFDocument.load(fontBytes)
-  const pages = pdfDoc.getPages()
+  // Otsikko
+  page.drawText('IPSC Ampumakoe – Tuloskortti', { x: 50, y, size: 18, font: boldFont, color: BLACK })
+  y -= 25
+  page.drawText(`Ampuja: ${ampuja}`, { x: 50, y, size: 12, font, color: BLACK })
+  y -= 15
+  page.drawText(`Päivämäärä: ${new Date().toLocaleDateString('fi-FI')}`, { x: 50, y, size: 12, font, color: BLACK })
+  y -= 25
 
-  pages[0].setFontColor(rgb(0.1, 0.1, 0.97))
+  // Rastit
+  for (let rasti = 0; rasti < 5; rasti++) {
+    const rastiPisteet = pisteetStore.getPelaajaRastiPisteSumma(ampuja, rasti)
+    const rastiAika = pisteetStore.getPelaajanRastiAika(ampuja, rasti)
+    const rastiHF = rastiAika > 0 ? rastiPisteet / rastiAika : 0
 
-  pages[0].drawText(ampuja, {x: 60, y: 714, size: 12})
+    page.drawText(`Rasti ${rasti + 1}`, { x: 50, y, size: 13, font: boldFont, color: BLACK })
+    y -= 14
 
-  for (let rasti in SraAmpumakoe.rastit) {
-    for (let rivi in [0,1,2,3,4,5]) {
-      // Taulu 1
-      pages[0].drawText(muotoileLuku(pisteetStore.pisteet[ampuja][rasti][rivi][0]), {x: T1_X, y: RASTI_Y_OFFSET[rasti] - Number(rivi)*ROW_H, size: 10})
-      // Taulu 2
-      pages[0].drawText(muotoileLuku(pisteetStore.pisteet[ampuja][rasti][rivi][1]), {x: T2_X, y: RASTI_Y_OFFSET[rasti] - Number(rivi)*ROW_H, size: 10})
-      // Osumat
-      pages[0].drawText(muotoileLuku(pisteetStore.getPelaajaRastiLuokkaOsumat(ampuja, Number(rasti))[rivi]), {x: OSUMAT_X, y: RASTI_Y_OFFSET[rasti] - Number(rivi)*ROW_H, size: 10})
-      // Pisteet
-      pages[0].drawText(muotoileLuku(pisteetStore.getPelaajaRastiPisteet(ampuja, Number(rasti))[rivi]), {x: PISTEET_X, y: RASTI_Y_OFFSET[rasti] - Number(rivi)*ROW_H, size: 10})
-      // Aika
-      if (Number(rivi) < 3) {
-        pages[0].drawText(muotoileAika(pisteetStore.getPelaajanRastiAjat(ampuja, Number(rasti))[rivi]), {x: AIKA_X, y: RASTI_Y_OFFSET[rasti] - Number(rivi) * ROW_H, size: 10})
-      }
+    // Saraketunnisteet
+    page.drawText('Osumaluokka', { x: 55, y, size: 9, font: boldFont, color: GRAY })
+    page.drawText('T1', { x: 180, y, size: 9, font: boldFont, color: GRAY })
+    page.drawText('T2', { x: 215, y, size: 9, font: boldFont, color: GRAY })
+    page.drawText('Yht.', { x: 250, y, size: 9, font: boldFont, color: GRAY })
+    page.drawText('Pisteet', { x: 285, y, size: 9, font: boldFont, color: GRAY })
+    y -= 12
+
+    for (let luokkaIdx = 0; luokkaIdx < IpscAmpumakoe.osumaluokat.length; luokkaIdx++) {
+      const luokka = IpscAmpumakoe.osumaluokat[luokkaIdx]
+      const t1 = pisteetStore.pisteet[ampuja][rasti][luokkaIdx][0]
+      const t2 = pisteetStore.pisteet[ampuja][rasti][luokkaIdx][1]
+      const yhteensa = t1 + t2
+      const pisteet = pisteetStore.getPelaajaRastiPisteet(ampuja, rasti)[luokkaIdx]
+      page.drawText(luokka, { x: 55, y, size: 10, font, color: BLACK })
+      page.drawText(muotoileLuku(t1), { x: 180, y, size: 10, font, color: BLACK })
+      page.drawText(muotoileLuku(t2), { x: 215, y, size: 10, font, color: BLACK })
+      page.drawText(muotoileLuku(yhteensa), { x: 250, y, size: 10, font, color: BLACK })
+      page.drawText(muotoileLuku(pisteet), { x: 285, y, size: 10, font, color: BLACK })
+      y -= 12
     }
 
-    if (pisteetStore.hylkaykset[ampuja] !== undefined) {
-      pages[0].drawText(pisteetStore.hylkaykset[ampuja], {x: 40, y: 50, size: 10})
+    // Ajat
+    const ajat = pisteetStore.getPelaajanRastiAjat(ampuja, rasti)
+    if (rasti <= 1) {
+      page.drawText(`Ajat: ${muotoileAika(ajat[0])} s / ${muotoileAika(ajat[1])} s / ${muotoileAika(ajat[2])} s`, { x: 55, y, size: 10, font, color: BLACK })
+    } else {
+      page.drawText(`Aika: ${muotoileAika(ajat[0])} s`, { x: 55, y, size: 10, font, color: BLACK })
     }
+    y -= 12
 
-    // Yhteenlasketut pisteet ja aika
-    pages[0].drawText(muotoileLuku(pisteetStore.getPelaajaRastiPisteSumma(ampuja, Number(rasti))), {x: PISTEET_X, y: RASTI_Y_OFFSET[rasti] - 5 * ROW_H, size: 10})
-    pages[0].drawText(muotoileAika(pisteetStore.getPelaajanRastiAika(ampuja as string, Number(rasti))), {x: AIKA_X, y: RASTI_Y_OFFSET[rasti] - 5 * ROW_H, size: 10})
+    page.drawText(
+      `Pisteet: ${rastiPisteet}  Aika: ${muotoileAika(rastiAika)} s  HF: ${rastiHF > 0 ? rastiHF.toFixed(2) : '-'}`,
+      { x: 55, y, size: 10, font: boldFont, color: BLACK }
+    )
+    y -= 20
   }
 
-  // Aikasumma, pistesumma, osumakerroin
-  pages[0].drawText(muotoileLuku(pisteetStore.getPelaajanPisteSumma(ampuja)), {x: 552, y: 165, size: 10})
-  pages[0].drawText(muotoileAika(pisteetStore.getPelaajanAikaSumma(ampuja)), {x: 552, y: 149, size: 10})
-  pages[0].drawText(muotoileOsumakerroinPdf(pisteetStore.getPelaajanOsumakerroin(ampuja as string)), {x: 552, y: 137, size: 10})
+  // Yhteenveto
+  page.drawLine({ start: { x: 50, y: y + 5 }, end: { x: 545, y: y + 5 }, thickness: 1, color: GRAY })
+  y -= 5
+
+  const totalPisteet = pisteetStore.getPelaajanPisteSumma(ampuja)
+  const totalAika = pisteetStore.getPelaajanAikaSumma(ampuja)
+  const totalHF = totalAika > 0 ? totalPisteet / totalAika : 0
+
+  page.drawText(`Kokonaisaika: ${muotoileAika(totalAika)} s`, { x: 50, y, size: 11, font, color: BLACK })
+  y -= 14
+  page.drawText(`Kokonaispisteet: ${totalPisteet}`, { x: 50, y, size: 11, font, color: BLACK })
+  y -= 14
+  page.drawText(`Hit Factor (HF): ${totalHF > 0 ? totalHF.toFixed(2) : '-'}`, { x: 50, y, size: 11, font, color: BLACK })
+  y -= 20
+
+  if (pisteetStore.hylkaykset[ampuja] !== undefined) {
+    page.drawText(`DQ: ${pisteetStore.hylkaykset[ampuja]}`, { x: 50, y, size: 12, font: boldFont, color: RED })
+    y -= 18
+  }
+
+  const hyvaksytty = !(ampuja in pisteetStore.hylkaykset) && pisteetStore.getKaikkiRastitSuoritettu(ampuja) && totalHF >= 1.3
+  const tulosVari = hyvaksytty ? GREEN : RED
+  const tulosTeksti = ampuja in pisteetStore.hylkaykset ? 'HYLÄTTY (DQ)' : !pisteetStore.getKaikkiRastitSuoritettu(ampuja) ? 'KESKEN' : hyvaksytty ? 'HYVÄKSYTTY' : 'HYLÄTTY'
+  page.drawText(tulosTeksti, { x: 50, y, size: 16, font: boldFont, color: tulosVari })
 
   const pdfBytes = await pdfDoc.save()
-  download(pdfBytes, "sra-ampumakoe-" + (new Date()).toISOString().substring(0,10) + "-" +ampuja.replace(" ", "-")+ ".pdf", "application/pdf");
+  download(pdfBytes, 'ipsc-ampumakoe-' + new Date().toISOString().substring(0, 10) + '-' + ampuja.replace(' ', '-') + '.pdf', 'application/pdf')
 }
 
 // onMounted(() => {
@@ -200,9 +245,9 @@ async function createPdf(ampuja: string) {
     <div class="sisalto">
 
     <div class="intro" v-if="muokkausTila">
-      Tervetuloa SRA ampumakokeeseen. Syötä ampumakokeeseen ostallistuvien henkilöiden nimet alla. Sovellukseen
-      kirjatut tiedot tallentuvat ainoastaan päätelaitteen muistiin. Tietoja ei tallenneta ja jaeta verkossa. Voit
-      ladata PDF-muotoiset tulospöytäkirjat tuloksien kirjaamisen jälkeen.
+      Tervetuloa IPSC-ampumakokeeseen. Syötä ampumakokeeseen osallistuvien henkilöiden nimet alla. Sovellukseen
+      kirjatut tiedot tallentuvat ainoastaan päätelaitteen muistiin. Tietoja ei tallenneta eikä jaeta verkossa. Voit
+      ladata PDF-muotoiset tuloskortat tuloksien kirjaamisen jälkeen.
     </div>
 
     <h2 v-if="muokkausTila">Ampujat</h2>
@@ -267,7 +312,7 @@ async function createPdf(ampuja: string) {
       <button class="action" v-if="Object.keys(pisteetStore.pisteet).length > 0 && muokkausTila && pisteetStore.turvallisuuskoulutusSuoritettu" @click="muokkausTila = !muokkausTila">Jatka</button>
       <button class="action" v-if="Object.keys(pisteetStore.pisteet).length > 0 && muokkausTila && pisteetStore.turvallisuuskoulutusSuoritettu == false" @click="$router.push('turvallisuus')">Jatka</button>
 
-      <button v-if="!muokkausTila && pisteetStore.turvallisuuskoulutusSuoritettu" class="action" @click="$router.push('kirjaus/0/' + Object.keys(pisteetStore.pisteet)[0])">Aloita ampumakoe</button>
+      <button v-if="!muokkausTila && pisteetStore.turvallisuuskoulutusSuoritettu" class="action" @click="$router.push('kirjaus/0/' + Object.keys(pisteetStore.pisteet)[0])">Aloita IPSC-ampumakoe</button>
     </div>
 
     </div>

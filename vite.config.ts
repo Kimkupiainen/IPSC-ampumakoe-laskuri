@@ -19,9 +19,9 @@ export default defineConfig({
         globPatterns: ['**/*.{js,ts,css,html,ico,jpg,png,pdf,svg}']
       },
       manifest: {
-        name: 'SRA ampumakokeen pistelaskuri',
-        short_name: 'SRA koe',
-        description: 'Sovellettu reserviläisammunta (SRA) ampumakokeen pistelaskuri.',
+        name: 'IPSC-ampumakoe pistelaskuri',
+        short_name: 'IPSC koe',
+        description: 'IPSC-ampumakokeen pistelaskuri.',
         theme_color: '#a28c67',
         icons: [
           {
@@ -47,7 +47,7 @@ export default defineConfig({
   define: {
         '__APP_VERSION__': JSON.stringify(process.env.npm_package_version),
     },
-  base: '/sra-ampumakoe-laskuri/',
+  base: '/IPSC-ampumakoe-laskuri/',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

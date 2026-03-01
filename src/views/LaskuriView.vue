@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue'
-import {RastiSuorituksenTila, SraAmpumakoe} from '@/classes/SraAmpumakoe'
+import {RastiSuorituksenTila, IpscAmpumakoe} from '@/classes/IpscAmpumakoe'
 import {usePisteetStore} from '@/stores/pisteet'
 import {useRoute} from 'vue-router'
 import RastiPisteRivi from '@/components/RastiPisteRivi.vue'
@@ -94,7 +94,7 @@ const ohjeFraasi = (rasti: number, ampuja: string) : string => {
     if (rasti < 4) {
       return `Ammutaan. Seuraava ampuja ${ampuja}, tämän rastin viimeinen ampuja.`
     } else {
-      return `Ammutaan. Seuraava ampuja ${ampuja}, ampumakokeen viimeinen suoritus.`
+      return `Ammutaan. Seuraava ampuja ${ampuja}, IPSC-ampumakokeen viimeinen suoritus.`
     }
   } else {
     return `Ammutaan. Seuraava ampuja ${ampuja}, ${seuraavaAmpuja} valmistautuu.`
@@ -208,7 +208,7 @@ const rastiClasses = (rasti: number, r: number) => {
 }
 
 const naytaKuvaus = (rasti: number) => {
-  return SraAmpumakoe.rastikuvaus(rasti)
+  return IpscAmpumakoe.rastikuvaus(rasti)
 }
 
 const muotoileOsumakerroin = (hf: number): string => {
@@ -220,11 +220,7 @@ const muotoileOsumakerroin = (hf: number): string => {
 
 /** Onko taulun pisteytys valmis tämän ampuja/rasti suorituksen osalta? */
 const taulunPisteytysValmis = (ampuja: string, rasti: number, taulu: number) => {
-  if (pisteetStore.rastin5suoritustavat[ampuja] == 'kiv') {
-    return (pisteetStore.pisteet[ampuja][rasti].reduce((acc, cur) => acc + Number(cur[taulu]), 0) >= SraAmpumakoe.laukausMaaratKivaarilla[rasti][taulu])
-  } else {
-    return (pisteetStore.pisteet[ampuja][rasti].reduce((acc, cur) => acc + Number(cur[taulu]), 0) >= SraAmpumakoe.laukausMaaratPistoolilla[rasti][taulu])
-  }
+  return (pisteetStore.pisteet[ampuja][rasti].reduce((acc, cur) => acc + Number(cur[taulu]), 0) >= IpscAmpumakoe.laukausMaaratPistoolilla[rasti][taulu])
 }
 
 const peruHylkays = (ampuja: string) => {
@@ -319,16 +315,6 @@ const confirmKeskenerainenKirjaus = (ampuja: string, rasti: number) => {
         <h2 class="rastiotsikko">Rasti {{ rasti+1 }} / {{ ampuja }} </h2><div class="tulos" v-bind:class="rastinOsumakerroin(ampuja, rasti) >= 1.3 ? 'ok' : 'notok'">{{ muotoileOsumakerroin(rastinOsumakerroin(ampuja, rasti)) }}</div>
       </div>
 
-      <fieldset v-if="rasti === 4">
-        <legend>Suoritustapa:</legend>
-        <div>
-          <input type="radio" id="pist" value="pist" v-model="pisteetStore.rastin5suoritustavat[ampuja]" />
-          <label for="pist">Pistooli</label>
-          <input type="radio" id="kiv" value="kiv" v-model="pisteetStore.rastin5suoritustavat[ampuja]" />
-          <label for="kiv">Kivääri</label>
-        </div>
-      </fieldset>
-
       <div class="actions">
         <button v-if="!(ampuja in pisteetStore.hylkaykset)" class="action dq" @click="kirjaaHylkays(ampuja)">Kirjaa DQ</button>
         <button v-else @click="peruHylkays(ampuja as string)">Peru DQ</button>
@@ -389,7 +375,7 @@ const confirmKeskenerainenKirjaus = (ampuja: string, rasti: number) => {
         </thead>
         <tbody>
 
-        <RastiPisteRivi :key="idx" v-for="(osumaluokka, idx) in SraAmpumakoe.osumaluokat" :ampuja="ampuja" :rasti="rasti" :osumaluokka="osumaluokka" />
+        <RastiPisteRivi :key="idx" v-for="(osumaluokka, idx) in IpscAmpumakoe.osumaluokat" :ampuja="ampuja" :rasti="rasti" :osumaluokka="osumaluokka" />
 
         <tr>
           <td class="inv"></td>

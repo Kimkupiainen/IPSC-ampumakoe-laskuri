@@ -3,16 +3,16 @@
     <th class="osumaluokka">{{ props.osumaluokka }}</th>
     <td class="kuulakarkikyna">{{ osumaLkmTaulu0 > 0 ?  osumaLkmTaulu0 : "" }}</td>
     <td class="kuulakarkikyna">{{ osumaLkmTaulu1 > 0 ? osumaLkmTaulu1 : "" }}</td>
-    <td class="kuulakarkikyna">{{ osumaSumma(pisteetStore.pisteet[props.ampuja][props.rasti], SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) > 0 ? osumaSumma(pisteetStore.pisteet[props.ampuja][props.rasti], SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) : "" }}</td>
-    <td class="kuulakarkikyna">{{ pisteSumma(pisteetStore.pisteet[props.ampuja][props.rasti], SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) > 0 ? pisteSumma(pisteetStore.pisteet[props.ampuja][props.rasti], SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) : "" }}</td>
-    <td class="kuulakarkikyna"><span class="vaihe" v-if="props.rasti < 2 && SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka) < 3">{{ SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka) }}</span> {{ pisteetStore.getPelaajanRastiAjat(props.ampuja, props.rasti)[SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)] > 0 ? pisteetStore.getPelaajanRastiAjat(props.ampuja, props.rasti)[SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)] : "" }} </td>
+    <td class="kuulakarkikyna">{{ osumaSumma(pisteetStore.pisteet[props.ampuja][props.rasti], IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) > 0 ? osumaSumma(pisteetStore.pisteet[props.ampuja][props.rasti], IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) : "" }}</td>
+    <td class="kuulakarkikyna">{{ pisteSumma(pisteetStore.pisteet[props.ampuja][props.rasti], IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) > 0 ? pisteSumma(pisteetStore.pisteet[props.ampuja][props.rasti], IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)) : "" }}</td>
+    <td class="kuulakarkikyna"><span class="vaihe" v-if="props.rasti < 2 && IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka) < 3">{{ IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka) }}</span> {{ pisteetStore.getPelaajanRastiAjat(props.ampuja, props.rasti)[IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)] > 0 ? pisteetStore.getPelaajanRastiAjat(props.ampuja, props.rasti)[IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)] : "" }} </td>
   </tr>
 
 </template>
 
 <script setup lang="ts">
 import { usePisteetStore } from '@/stores/pisteet'
-import {SraAmpumakoe} from "@/classes/SraAmpumakoe";
+import {IpscAmpumakoe} from "@/classes/IpscAmpumakoe";
 import {computed} from "vue";
 
 const pisteetStore = usePisteetStore()
@@ -25,10 +25,10 @@ interface Props {
 const props = defineProps<Props>()
 
 const osumaLkmTaulu0 = computed( () =>  {
-    return pisteetStore.pisteet[props.ampuja][props.rasti][SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)][0]
+    return pisteetStore.pisteet[props.ampuja][props.rasti][IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)][0]
   })
 const osumaLkmTaulu1 = computed( () =>  {
-    return pisteetStore.pisteet[props.ampuja][props.rasti][SraAmpumakoe.osumaluokat.indexOf(props.osumaluokka)][1]
+    return pisteetStore.pisteet[props.ampuja][props.rasti][IpscAmpumakoe.osumaluokat.indexOf(props.osumaluokka)][1]
   })
 
 
