@@ -166,8 +166,8 @@ async function createPdf(ampuja: string) {
   for (let rasti = 0; rasti < 9; rasti++) {
     // Kukin asema vie 42pt: otsikkorivi (sisältää "A C D M Pr Pist Aika HF") + T1-rivi + T2-rivi (à ~14pt)
     // t1Y = T1-datarivi, t2Y = T2-datarivi (otsikkorivi on 14pt korkeammalla)
-    const t1Y = 684 - rasti * 50
-    const t2Y = 670 - rasti * 50
+    const t1Y = 682 - rasti * 52
+    const t2Y = 670 - rasti * 52
 
     const p = pisteetStore.pisteet[ampuja][rasti]
     const rastiAika    = pisteetStore.getPelaajanRastiAika(ampuja, rasti)
