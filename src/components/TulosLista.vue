@@ -130,160 +130,86 @@ const muotoileAika = (luku: number) : string => {
 async function createPdf(ampuja: string) {
   const { StandardFonts } = await import('pdf-lib')
 
-  const pdfDoc = await PDFDocument.create()
+  // Ladataan PDF-pohja
+  const templateBytes = await fetch(import.meta.env.BASE_URL + 'IPSC-ampumakoe.pdf').then(r => r.arrayBuffer())
+  const pdfDoc = await PDFDocument.load(templateBytes)
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
   const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
-  const page = pdfDoc.addPage([595, 842]) // A4
+
+  // Sivu 2 (indeksi 1) on pisteytyslomake
+  const page = pdfDoc.getPages()[1]
 
   const BLACK = rgb(0, 0, 0)
   const GREEN = rgb(0, 0.45, 0)
-  const RED = rgb(0.7, 0, 0)
-  const GRAY = rgb(0.45, 0.45, 0.45)
-  const LGRAY = rgb(0.75, 0.75, 0.75)
-  const BLUE = rgb(0.1, 0.1, 0.6)
+  const RED   = rgb(0.7, 0, 0)
 
-  // Column x positions
-  const COL = {
-    asema: 50,       // "Asema N"
-    t1A: 130, t1C: 155, t1D: 180, t1M: 205,
-    t2A: 240, t2C: 265, t2D: 290, t2M: 315,
-    proc: 348,
-    pts:  380,
-    aika: 420,
-    hf:   468,
-    ok:   516,
+  // Apufunktio: ei piirretä tyhjiä merkkijonoja
+  const txt = (text: string, x: number, y: number, size = 9, f = font, color = BLACK) => {
+    if (text) page.drawText(text, { x, y, size, font: f, color })
   }
 
-  let y = 810
+  // ── Kokelaan tiedot ──────────────────────────────────────────────────────
+  const parts = ampuja.trim().split(' ')
+  const etunimet = parts.slice(0, -1).join(' ') || ampuja
+  const sukunimi = parts.length > 1 ? parts[parts.length - 1] : ''
+  txt(etunimet, 385, 768)
+  txt(sukunimi,  385, 754)
 
-  // ── Header ──────────────────────────────────────────────────────────────
-  page.drawText('PRACTICAL-PERUSKURSSI AMPUMAKOE – PISTOOLI', {
-    x: 50, y, size: 13, font: boldFont, color: BLACK
-  })
-  y -= 16
-  page.drawText(`Ampuja: ${ampuja}`, { x: 50, y, size: 10, font, color: BLACK })
-  page.drawText(`Päivämäärä: ${new Date().toLocaleDateString('fi-FI')}`, { x: 310, y, size: 10, font, color: BLACK })
-  y -= 8
-  page.drawLine({ start: { x: 50, y }, end: { x: 545, y }, thickness: 0.5, color: LGRAY })
-  y -= 14
+  // ── Pistetaulukko (9 asemaa, T1 ja T2) ───────────────────────────────────
+  // Sarakkeiden x-koordinaatit (vasemmasta reunasta mitattuna)
+  // HUOM: Nämä ovat arvioja — säädä tarvittaessa testauksen perusteella
+  const X = { A: 313, C: 333, D: 353, M: 373, Pr: 393, Pist: 415, Aika: 453, HF: 503 }
 
-  // ── Column headers ───────────────────────────────────────────────────────
-  const hdrY = y
-  page.drawText('Asema', { x: COL.asema, y: hdrY, size: 8, font: boldFont, color: GRAY })
-  // T1 group header
-  page.drawText('T1', { x: COL.t1A + 22, y: hdrY + 8, size: 8, font: boldFont, color: GRAY })
-  page.drawText('A',  { x: COL.t1A,  y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('C',  { x: COL.t1C,  y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('D',  { x: COL.t1D,  y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('M',  { x: COL.t1M,  y: hdrY, size: 8, font: boldFont, color: GRAY })
-  // T2 group header
-  page.drawText('T2', { x: COL.t2A + 22, y: hdrY + 8, size: 8, font: boldFont, color: GRAY })
-  page.drawText('A',  { x: COL.t2A,  y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('C',  { x: COL.t2C,  y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('D',  { x: COL.t2D,  y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('M',  { x: COL.t2M,  y: hdrY, size: 8, font: boldFont, color: GRAY })
-
-  page.drawText('Proc', { x: COL.proc, y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('Pts',  { x: COL.pts,  y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('Aika s', { x: COL.aika, y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('HF',   { x: COL.hf,   y: hdrY, size: 8, font: boldFont, color: GRAY })
-  page.drawText('≥1,4', { x: COL.ok,   y: hdrY, size: 8, font: boldFont, color: GRAY })
-
-  y -= 6
-  page.drawLine({ start: { x: 50, y }, end: { x: 545, y }, thickness: 0.5, color: LGRAY })
-  y -= 4
-
-  // ── Per-stage rows ────────────────────────────────────────────────────────
   for (let rasti = 0; rasti < 9; rasti++) {
+    // Kunkin aseman T1- ja T2-rivin y-koordinaatit
+    // Jokainen asema vie ~42 pistettä pystysuunnassa (otsikko + T1 + T2)
+    const t1Y = 684 - rasti * 42
+    const t2Y = 670 - rasti * 42
+
+    const p = pisteetStore.pisteet[ampuja][rasti]
+    const rastiAika    = pisteetStore.getPelaajanRastiAika(ampuja, rasti)
     const rastiPisteet = pisteetStore.getPelaajaRastiPisteSumma(ampuja, rasti)
-    const rastiAika = pisteetStore.getPelaajanRastiAika(ampuja, rasti)
-    const rastiHF = rastiAika > 0 ? rastiPisteet / rastiAika : 0
-    const suoritettu = pisteetStore.getRastiSuorituksenTila(ampuja, rasti)
-    const hyvaksyttyAsema = suoritettu === 2 /* Suoritettu */ && rastiHF >= IpscAmpumakoe.hyvaksymisRaja
+    const rastiHF      = rastiAika > 0 ? rastiPisteet / rastiAika : 0
+    const suoritettu   = pisteetStore.getRastiSuorituksenTila(ampuja, rasti)
+    const ok           = suoritettu === 2 && rastiHF >= IpscAmpumakoe.hyvaksymisRaja
 
-    // Shade alternating rows
-    if (rasti % 2 === 0) {
-      page.drawRectangle({ x: 50, y: y - 2, width: 495, height: 13, color: rgb(0.96, 0.96, 0.96), opacity: 1 })
-    }
+    // T1-rivi: A, C, D, M (Ohi), Pr (Rang)
+    txt(muotoileLuku(p[0][0]), X.A,  t1Y, 8, font, BLACK)
+    txt(muotoileLuku(p[1][0]), X.C,  t1Y, 8, font, BLACK)
+    txt(muotoileLuku(p[2][0]), X.D,  t1Y, 8, font, BLACK)
+    txt(muotoileLuku(p[3][0]), X.M,  t1Y, 8, font, p[3][0] > 0 ? RED : BLACK)
+    txt(muotoileLuku(p[4][0]), X.Pr, t1Y, 8, font, p[4][0] > 0 ? RED : BLACK)
 
-    const rowY = y
-    const osumat = IpscAmpumakoe.osumaluokat.map((_, idx) => ({
-      t1: pisteetStore.pisteet[ampuja][rasti][idx][0],
-      t2: pisteetStore.pisteet[ampuja][rasti][idx][1],
-    }))
+    // T2-rivi
+    txt(muotoileLuku(p[0][1]), X.A,  t2Y, 8, font, BLACK)
+    txt(muotoileLuku(p[1][1]), X.C,  t2Y, 8, font, BLACK)
+    txt(muotoileLuku(p[2][1]), X.D,  t2Y, 8, font, BLACK)
+    txt(muotoileLuku(p[3][1]), X.M,  t2Y, 8, font, p[3][1] > 0 ? RED : BLACK)
+    txt(muotoileLuku(p[4][1]), X.Pr, t2Y, 8, font, p[4][1] > 0 ? RED : BLACK)
 
-    page.drawText(`Asema ${rasti + 1}`, { x: COL.asema, y: rowY, size: 9, font: boldFont, color: BLACK })
-
-    // T1 columns: A=idx0, C=idx1, D=idx2, Miss=idx3
-    page.drawText(muotoileLuku(osumat[0].t1), { x: COL.t1A, y: rowY, size: 9, font, color: BLACK })
-    page.drawText(muotoileLuku(osumat[1].t1), { x: COL.t1C, y: rowY, size: 9, font, color: BLACK })
-    page.drawText(muotoileLuku(osumat[2].t1), { x: COL.t1D, y: rowY, size: 9, font, color: BLACK })
-    page.drawText(muotoileLuku(osumat[3].t1), { x: COL.t1M, y: rowY, size: 9, font, color: osumat[3].t1 > 0 ? RED : BLACK })
-    // T2 columns
-    page.drawText(muotoileLuku(osumat[0].t2), { x: COL.t2A, y: rowY, size: 9, font, color: BLACK })
-    page.drawText(muotoileLuku(osumat[1].t2), { x: COL.t2C, y: rowY, size: 9, font, color: BLACK })
-    page.drawText(muotoileLuku(osumat[2].t2), { x: COL.t2D, y: rowY, size: 9, font, color: BLACK })
-    page.drawText(muotoileLuku(osumat[3].t2), { x: COL.t2M, y: rowY, size: 9, font, color: osumat[3].t2 > 0 ? RED : BLACK })
-    // Procedural (Rang, idx4)
-    const proc = osumat[4].t1 + osumat[4].t2
-    page.drawText(muotoileLuku(proc), { x: COL.proc, y: rowY, size: 9, font, color: proc > 0 ? RED : BLACK })
-    // Pts, Aika, HF
-    page.drawText(muotoileLuku(rastiPisteet), { x: COL.pts, y: rowY, size: 9, font: boldFont, color: BLACK })
-    page.drawText(muotoileAika(rastiAika), { x: COL.aika, y: rowY, size: 9, font, color: BLACK })
-    if (rastiHF > 0) {
-      page.drawText(rastiHF.toFixed(2), { x: COL.hf, y: rowY, size: 9, font: boldFont, color: hyvaksyttyAsema ? GREEN : RED })
-    }
-    // Pass/fail tick for this stage
+    // Aseman yhteistiedot (Pist, Aika, HF) — T1-rivillä
     if (suoritettu === 2) {
-      page.drawText(hyvaksyttyAsema ? '✓' : '✗', { x: COL.ok, y: rowY, size: 10, font: boldFont, color: hyvaksyttyAsema ? GREEN : RED })
+      txt(rastiPisteet.toString(), X.Pist, t1Y, 8, boldFont, BLACK)
+      txt(muotoileAika(rastiAika), X.Aika, t1Y, 8, font,     BLACK)
+      txt(rastiHF.toFixed(2),      X.HF,   t1Y, 8, boldFont, ok ? GREEN : RED)
     }
-
-    y -= 13
   }
 
-  // ── Separator ─────────────────────────────────────────────────────────────
-  page.drawLine({ start: { x: 50, y }, end: { x: 545, y }, thickness: 1, color: LGRAY })
-  y -= 16
+  // ── Tulos ────────────────────────────────────────────────────────────────
+  const kaikkiSuoritettu  = pisteetStore.getKaikkiRastitSuoritettu(ampuja)
+  const hyvaksyttyjenLkm  = pisteetStore.getPelaajanHyvaksyttyjenAsemienLkm(ampuja)
+  const dq                = ampuja in pisteetStore.hylkaykset
+  const hyvaksytty        = !dq && kaikkiSuoritettu && hyvaksyttyjenLkm >= IpscAmpumakoe.hyvaksymisAsemia
 
-  // ── Summary ───────────────────────────────────────────────────────────────
-  const totalPisteet = pisteetStore.getPelaajanPisteSumma(ampuja)
-  const totalAika = pisteetStore.getPelaajanAikaSumma(ampuja)
-  const totalHF = totalAika > 0 ? totalPisteet / totalAika : 0
-  const hyvaksyttyjenLkm = pisteetStore.getPelaajanHyvaksyttyjenAsemienLkm(ampuja)
-  const kaikkiSuoritettu = pisteetStore.getKaikkiRastitSuoritettu(ampuja)
-  const hyvaksytty = !(ampuja in pisteetStore.hylkaykset) && kaikkiSuoritettu && hyvaksyttyjenLkm >= IpscAmpumakoe.hyvaksymisAsemia
-
-  page.drawText(`Hyväksytyt asemat: ${hyvaksyttyjenLkm} / 9  (vaatimus: vähintään ${IpscAmpumakoe.hyvaksymisAsemia})`, { x: 50, y, size: 10, font, color: BLACK })
-  y -= 14
-  page.drawText(`Kokonaispisteet: ${totalPisteet}   Kokonaisaika: ${muotoileAika(totalAika)} s   Yht. HF: ${totalHF > 0 ? totalHF.toFixed(2) : '–'}`, { x: 50, y, size: 10, font, color: BLACK })
-  y -= 18
-
-  if (pisteetStore.hylkaykset[ampuja] !== undefined) {
-    page.drawText(`DQ: ${pisteetStore.hylkaykset[ampuja]}`, { x: 50, y, size: 11, font: boldFont, color: RED })
-    y -= 16
+  if (hyvaksytty) {
+    txt('X', 289, 305, 11, boldFont, GREEN)
+  } else if (kaikkiSuoritettu || dq) {
+    txt('X', 289, 283, 11, boldFont, RED)
+    if (dq) txt(pisteetStore.hylkaykset[ampuja], 340, 283, 8, font, RED)
   }
 
-  const tulosTeksti = ampuja in pisteetStore.hylkaykset
-    ? 'HYLÄTTY (DQ)'
-    : !kaikkiSuoritettu
-      ? 'KESKEN'
-      : hyvaksytty ? 'HYVÄKSYTTY' : 'HYLÄTTY'
-  const tulosVari = tulosTeksti === 'HYVÄKSYTTY' ? GREEN : tulosTeksti === 'KESKEN' ? BLUE : RED
-  page.drawText(tulosTeksti, { x: 50, y, size: 20, font: boldFont, color: tulosVari })
-  y -= 30
-
-  // ── Signature line ────────────────────────────────────────────────────────
-  page.drawLine({ start: { x: 50, y }, end: { x: 250, y }, thickness: 0.5, color: LGRAY })
-  page.drawLine({ start: { x: 310, y }, end: { x: 545, y }, thickness: 0.5, color: LGRAY })
-  y -= 12
-  page.drawText('Ampujan allekirjoitus', { x: 50, y, size: 8, font, color: GRAY })
-  page.drawText('Tuomarin allekirjoitus', { x: 310, y, size: 8, font, color: GRAY })
-
-  // ── Footer note ───────────────────────────────────────────────────────────
-  page.drawText(
-    'Pistelaskutapa: Comstock. Hyväksytty suoritus: HF ≥ 1,4 vähintään 7 asemalla, ei turvallisuusrikettä.',
-    { x: 50, y: 30, size: 7.5, font, color: GRAY }
-  )
+  // Päivämäärä
+  txt(new Date().toLocaleDateString('fi-FI'), 370, 248, 9)
 
   const pdfBytes = await pdfDoc.save()
   download(pdfBytes, 'ipsc-ampumakoe-' + new Date().toISOString().substring(0, 10) + '-' + ampuja.replace(' ', '-') + '.pdf', 'application/pdf')
