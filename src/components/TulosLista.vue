@@ -212,7 +212,7 @@ async function createPdf(ampuja: string) {
   }
 
   // Päivämäärä
-  txt(new Date().toLocaleDateString('fi-FI'), 174, 80, 14)
+  txt(new Date().toLocaleDateString('fi-FI'), 178, 100, 14)
 
   const pdfBytes = await pdfDoc.save()
   download(pdfBytes, 'ipsc-ampumakoe-' + new Date().toISOString().substring(0, 10) + '-' + ampuja.replace(' ', '-') + '.pdf', 'application/pdf')
