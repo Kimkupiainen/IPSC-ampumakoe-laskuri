@@ -155,8 +155,8 @@ async function createPdf(ampuja: string) {
   const parts = ampuja.trim().split(' ')
   const etunimet = parts.slice(0, -1).join(' ') || ampuja
   const sukunimi = parts.length > 1 ? parts[parts.length - 1] : ''
-  txt(etunimet, 385, 768)
-  txt(sukunimi,  385, 754)
+  txt(etunimet, 390, 770)
+  txt(sukunimi,  390, 756)
 
   // ── Pistetaulukko (9 asemaa, T1 ja T2) ───────────────────────────────────
   // Sarakkeiden x-koordinaatit (vasemmasta reunasta mitattuna)
