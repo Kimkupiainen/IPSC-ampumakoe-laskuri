@@ -18,7 +18,7 @@
       <li>Asemien <strong>minimilaukausmäärä on 4</strong>, ellei muuta ole mainittu.</li>
       <li><strong>Lipastusrajoitus (pistooli):</strong> 4 patruunaa / lipas.</li>
       <li><strong>Laukausmäärärajoitus (revolveri):</strong> 6 laukausta ennen uudelleenlatausta.</li>
-      <li>Pistelaskutapa: <strong>Comstock</strong> – laukausmäärää ei ole rajoitettu, paikkolaukauksia saa ampua vapaasti.</li>
+      <li>Pistelaskutapa: <strong>Comstock</strong> – laukausmäärä kokeessa on rajoitettu.</li>
     </ul>
 
     <hr />
