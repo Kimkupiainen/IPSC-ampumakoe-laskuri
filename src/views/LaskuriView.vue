@@ -193,18 +193,20 @@ const rastinOsumakerroin = (ampuja: string, rasti: number): number => {
   return pisteet/aika
 }
 
-const rastiClasses = (rasti: number, r: number) => {
-  if (r == rasti) {
-    return 'active'
+const rastiClasses = (rasti: number, r: number, ampuja: string) => {
+  const baseClass = r == rasti ? 'active' : (() => {
+    const ampujat = Object.keys(pisteetStore.pisteet).filter((a) => !(a in pisteetStore.hylkaykset))
+    if (ampujat.map((a) => pisteetStore.getRastiSuorituksenTila(a, r)).filter((t) => t == RastiSuorituksenTila.Suoritettu).length == ampujat.length) {
+      return 'done'
+    }
+    return 'todo'
+  })()
+
+  if (pisteetStore.getRastiSuorituksenTila(ampuja, r) === RastiSuorituksenTila.Suoritettu) {
+    const hf = rastinOsumakerroin(ampuja, r)
+    return baseClass + (Math.round(hf * 100) / 100 >= IpscAmpumakoe.hyvaksymisRaja ? ' hf-ok' : ' hf-notok')
   }
-  const ampujat = Object.keys(pisteetStore.pisteet).filter((ampuja) => !(ampuja in pisteetStore.hylkaykset))
-  if (ampujat.map((ampuja) => pisteetStore.getRastiSuorituksenTila(ampuja, r)).filter((t) => t == RastiSuorituksenTila.Suoritettu).length == ampujat.length) {
-    return 'done'
-  }
-  //if (ampujat.map((ampuja) => pisteetStore.getRastiSuorituksenTila(ampuja, r)).filter((t) => t == RastiSuorituksenTila.Suorittamatta).length == ampujat.length) {
-  //  return 'suorittamatta'
-  //}
-  return 'todo'
+  return baseClass
 }
 
 const naytaKuvaus = (rasti: number) => {
@@ -284,7 +286,7 @@ const confirmKeskenerainenKirjaus = (ampuja: string, rasti: number) => {
 
     <nav class="rastit">
       <ul>
-        <li :key="r" class="rasti" v-for="r in [0,1,2,3,4,5,6,7,8]" v-bind:class="rastiClasses(rasti, r)">
+        <li :key="r" class="rasti" v-for="r in [0,1,2,3,4,5,6,7,8]" v-bind:class="rastiClasses(rasti, r, ampuja)">
           <a class="rasti" :href="'../../kirjaus/' + r + '/' + ampuja">{{ r + 1 }}</a>
         </li>
       </ul>
@@ -676,6 +678,22 @@ nav.rastit {
     left: -0px;
     top: 0;
     z-index: 5;
+  }
+
+  ul li.hf-ok:not(.active) a {
+    background-color: #2d7a2d;
+    color: white;
+  }
+  ul li.hf-ok:not(.active) a:after {
+    border-left-color: #2d7a2d;
+  }
+
+  ul li.hf-notok:not(.active) a {
+    background-color: #c0392b;
+    color: white;
+  }
+  ul li.hf-notok:not(.active) a:after {
+    border-left-color: #c0392b;
   }
   ul li:first-child a {
     width: 1.5rem;
