@@ -37,7 +37,7 @@ const version = __APP_VERSION__
     <ul>
       <li>IPSC-ampumakoe-laskuri – IPSC-ampumakokeen pistelaskuri</li>
       <li>IPSC Minor -pisteytys (A=5, C=3, D=1, Ohi=−10, Rang=−10)</li>
-      <li>5 kiinteää IPSC-rastisuoritusta</li>
+      <li>9 kiinteää IPSC-stagesuoritusta</li>
       <li>PDF-tuloskortti ilman ulkoisia riippuvuuksia</li>
       <li>Kiväärivaihtoehto poistettu (pistoolikokeeseen)</li>
     </ul>

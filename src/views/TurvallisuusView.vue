@@ -16,21 +16,15 @@ const pisteetStore = usePisteetStore()
 
   <h1>Turvallisuus</h1>
   <p>
-    Kaikessa aseen käytössä on noudatettava seuraavia turvallisen aseenkäsittelyn sääntöjä:
+    Kaikissa aseenkäsittelytilanteissa on noudatettava seuraavia turvallisen aseenkäsittelyn sääntöjä:
   </p>
   <ol>
-    <li><b>Asetta on aina käsiteltävä kuin se olisi ladattu</b>.
-      Ei ole merkitystä, onko ase ladattu tai onko ase toimimaton käsittelyase, käsitte-
-      lyn on aina oltava samanlaista.</li>
-    <li>Piippukontrolli, <b>aseen piipun on aina osoitettava turvalliseen suuntaan</b>.
-      "Laser-sääntö", aseella ei saa koskaan osoittaa mitään sellaista, jota ei halua
-      tuhota.</li>
-    <li>Sormivarmistus, <b>sormi pidetään pois liipaisimelta ennen ampumapäätöstä</b>.
-      Liipaisinsormi on pidettävä tietoisesti aseen rungolla. Sormi laitetaan liipaisimelle
-      vasta, kun on tehty tietoinen ampumapäätös.</li>
-    <li><b>Tunnista maali ja varmista tausta</b>.
-      Maali on aina tunnistettava ennen kuin sitä ammutaan. Maalin takana ei saa olla
-      omia taistelijoita tai sivullisia.</li>
+    <li><b>Käsittele asetta aina kuin se olisi ladattu</b>.
+      Älä koskaan oleta aseen olevan tyhjä, vaan tarkista sen tila jokaisen käsittelykerran aluksi ja lopuksi.</li>
+    <li>Älä osoita aseella mitään, mitä et ole valmis tuhoamaan<b>. Pidä piippu aina turvalliseen suuntaan.</b>.</li>
+    <li>Pidä sormi liipaisinkaaren ulkopuolella<b>. Sormi saa mennä liipaisimelle vasta, kun olet valmis ampumaan</b>.</li>
+    <li><b>Ole varma maalistasi ja siitä, mitä sen takana on</b>.
+      Tunnista kohde ja varmista, ettei taustalla ole sivullisia ja ettei maalin ampuminen luo vaaratilannetta.</li>
   </ol>
 
   <div class="turvallisuuscheckbox">
