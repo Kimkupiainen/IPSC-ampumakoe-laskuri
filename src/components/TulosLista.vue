@@ -82,6 +82,16 @@ const mapClass = (tila: RastiSuorituksenTila) => {
   }
 }
 
+const nimeaUudelleen = (ampuja: string) => {
+  const uusinimi = window.prompt(`Vaihda ampujan "${ampuja}" nimi:`, ampuja)?.trim()
+  if (!uusinimi || uusinimi === ampuja) return
+  if (pisteetStore.pisteet[uusinimi] !== undefined) {
+    alert(`Ampuja nimellä "${uusinimi}" on jo listalla.`)
+    return
+  }
+  pisteetStore.nimeaAmpujaUudelleen(ampuja, uusinimi)
+}
+
 const vahvistaPoisto = (ampuja: string) => {
   if (confirm(`Poista ampujan ${ampuja} tulostiedot?`)) {
     pisteetStore.poistaAmpuja(ampuja)
@@ -246,7 +256,7 @@ async function createPdf(ampuja: string) {
     <h2 v-if="!muokkausTila">Tuloslista</h2>
 
     <ul v-if="muokkausTila" class="ampujat">
-      <li v-bind:key="ampuja" v-for="(ampujanPisteet, ampuja) in pisteetStore.pisteet">{{ ampuja }} <span @click="vahvistaPoisto(ampuja as string)" class="remove">ⓧ</span></li>
+      <li v-bind:key="ampuja" v-for="(ampujanPisteet, ampuja) in pisteetStore.pisteet">{{ ampuja }} <span @click="nimeaUudelleen(ampuja as string)" class="rename" title="Nimeä uudelleen">✏</span><span @click="vahvistaPoisto(ampuja as string)" class="remove">ⓧ</span></li>
     </ul>
 
     <table id="tuloslista" cellspacing="0" v-if="!muokkausTila">
@@ -464,6 +474,17 @@ table#tuloslista {
     border-radius: .8rem;
     padding: 0 .6rem 0 .6rem;
     margin: .1rem;
+
+    .rename {
+      display: inherit;
+      padding: .2rem .1rem .3rem 0;
+      font-size: 85%;
+      cursor: pointer;
+
+      &:hover {
+        color: #3a7a96;
+      }
+    }
 
     .remove {
       display: inherit;
