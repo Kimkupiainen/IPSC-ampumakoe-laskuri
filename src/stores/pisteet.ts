@@ -119,6 +119,15 @@ export const usePisteetStore = defineStore('pisteet', {
       // Muutoin rasti on suorittamatta
       return RastiSuorituksenTila.Suorittamatta
     },
+    nimeaAmpujaUudelleen(vanhanimi: string, uusinimi: string) {
+      if (!uusinimi || uusinimi === vanhanimi || this.pisteet[uusinimi] !== undefined) return
+      this.pisteet[uusinimi] = this.pisteet[vanhanimi]
+      this.ajat[uusinimi] = this.ajat[vanhanimi]
+      if (this.hylkaykset[vanhanimi]) this.hylkaykset[uusinimi] = this.hylkaykset[vanhanimi]
+      delete this.pisteet[vanhanimi]
+      delete this.ajat[vanhanimi]
+      delete this.hylkaykset[vanhanimi]
+    },
     poistaAmpuja(ampuja: string) {
       delete this.pisteet[ampuja]
       delete this.ajat[ampuja]

@@ -62,10 +62,10 @@
       Minimilaukausmäärä: <strong>4</strong> (2 lk./taulu).
     </p>
 
-    <h3>Asema 3 – Heikompi käsi</h3>
+    <h3>Asema 3 – Lataamaton ase pöydältä</h3>
     <p>
-      10 m. Lähtöasento: <strong>ase ladattuna pöydällä</strong>.<br/>
-      Ammu taulut <strong>vain heikompaa kättä</strong> käyttäen.<br/>
+      10 m. Lähtöasento: <strong>lataamaton ase ja kaikki lippaat pöydällä</strong>.<br/>
+      Ammu taulut.<br/>
       Minimilaukausmäärä: <strong>4</strong> (2 lk./taulu).
     </p>
 

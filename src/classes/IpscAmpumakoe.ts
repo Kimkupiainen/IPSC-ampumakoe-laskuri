@@ -28,7 +28,7 @@ export class IpscAmpumakoe {
         switch (rasti) {
             case 0: return "Asema 1 – 10 m. Lähtöasento sääntö 8.2.2 mukainen. Ammu taulut. Minimilaukausmäärä 4 (2 lk./taulu)."
             case 1: return "Asema 2 – 10 m. Lähtöasento sääntö 8.2.2 mukainen. Ammu taulut vain vahvempaa kättä käyttäen. Minimilaukausmäärä 4 (2 lk./taulu)."
-            case 2: return "Asema 3 – 10 m. Lähtöasento: ase ladattuna pöydällä. Ammu taulut vain heikompaa kättä käyttäen. Minimilaukausmäärä 4 (2 lk./taulu)."
+            case 2: return "Asema 3 – 10 m. Lähtöasento: lataamaton ase ja kaikki lippaat pöydällä. Ammu taulut. Minimilaukausmäärä 4 (2 lk./taulu)."
             case 3: return "Asema 4 – 10 m. Lähtöasento: selkä kohti tauluja. Käänny ja ammu taulut. Minimilaukausmäärä 4 (2 lk./taulu)."
             case 4: return "Asema 5 – 10 m. Lähtöasento: heikompi kylki kohti tauluja. Käänny ja ammu taulut. Minimilaukausmäärä 4 (2 lk./taulu)."
             case 5: return "Asema 6 – 10 m. Lähtöasento: vahvempi kylki kohti tauluja. Käänny ja ammu taulut. Minimilaukausmäärä 4 (2 lk./taulu)."
